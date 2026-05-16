@@ -84,7 +84,7 @@ reproject          # for crab_comparison.py only
 
 Observations taken 2026-03-17 at Leuschner Observatory. Three 60-second exposures in B, V, and R. Plate scale ~1.018 arcsec/px (7.52 µm pixels, 2×2 binning, 3047 mm focal length).
 
-HST comparison data from proposal 17500 (WFC3/UVIS, 6-tile mosaic). Downloaded via MAST — not included in this repo.
+HST comparison data from proposal 17500 (WFC3/UVIS, 6-tile mosaic). Downloaded via MAST — not included.
 
 ---
 
