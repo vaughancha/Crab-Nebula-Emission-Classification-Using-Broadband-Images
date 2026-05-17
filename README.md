@@ -8,15 +8,13 @@ BVR photometric calibration and pixel-level emission classification of the Crab 
 
 The Crab Nebula has two physically distinct emission components: a smooth synchrotron-emitting pulsar wind nebula (PWN) in the core, and a network of ionized filaments scattered across the outer shell. These components have different spectral shapes, which means they leave different fingerprints in broadband BVR imaging.
 
-This project takes raw B, V, and R frames of the Crab, runs them through a full photometric calibration pipeline, and then uses the resulting flux ratios to spatially classify each pixel as synchrotron-like or filament-like. Three classification methods are compared side by side.
-
-A companion script (`Project_E_NRE.py`) extends this with a Neural Ratio Estimation (NRE) approach, and `crab_comparison.py` validates both results against HST WFC3 narrowband ground truth.
+This project takes raw B, V, and R frames of the Crab, runs them through a full photometric calibration pipeline, and then uses the resulting flux ratios to spatially classify each pixel as synchrotron-like or filament-like. Three classical methods are compared side by side, and a Neural Ratio Estimation (NRE) approach produces a continuous P(filament) probability map.
 
 ---
 
 ## Pipeline overview
 
-**`Project_D.py`** — the main pipeline
+**`Project_D.py`** — the main calibration and classification pipeline
 
 1. **Flat correction** — divides each raw frame by a normalized master flat. Dark subtraction was already handled by MaxIm DL (CALSTAT=D in headers), so only the flat division is needed.
 
@@ -41,26 +39,32 @@ A companion script (`Project_E_NRE.py`) extends this with a Neural Ratio Estimat
 
 All three are displayed as spatial overlays on the V-band image.
 
-**`RGB_Stack.py`** — builds a flat-corrected false-color RGB composite of the Crab for visual inspection.
+---
 
-**`Project_E_NRE.py`** — Neural Ratio Estimation. Trains a binary MLP classifier on forward-simulated (log R/B, log V/B) spectra for synchrotron and filament pixels, then applies it per-pixel to produce a continuous P(filament) probability map.
+**`Project_E_NRE.py`** — Neural Ratio Estimation
 
-**`crab_comparison.py`** — reprojects HST WFC3 tiles (F547M continuum + F502N [OIII] line) onto our Leuschner pixel grid using WCS, computes a ground-truth filament ratio, and overlays it against our NRE P(filament) map.
+Trains a binary MLP classifier on forward-simulated (log R/B, log V/B) spectra for synchrotron and filament pixels, then applies it per-pixel to produce a continuous P(filament) probability map. Uses a custom numpy MLP with Adam optimizer — no PyTorch or TensorFlow required.
+
+---
+
+**`RGB_Stack.py`** — false-color composite
+
+Builds a flat-corrected BVR RGB image of the Crab for visual inspection.
 
 ---
 
 ## Output files
 
-
-| `Crab_B_cal.fits` / `Crab_V_cal.fits` / `Crab_R_cal.fits` | Flat-corrected, aligned, APASS-calibrated images |
-| `calibration_check.png` | Instrumental vs catalog magnitude scatter plots for all three bands |
-| `ratio_maps.png` | log(R/B) and log(V/B) maps of the Crab |
-| `color_color.png` | Color-color diagram with density and radial distance panels |
-| `spatial_overlay.png` | Side-by-side comparison of the three classification methods |
-| `rgb_crab.png` | False-color BVR composite |
-| `nre_classification.png` | NRE P(filament) probability map + histogram |
-| `crab_comparison.png` | HST WFC3 ground truth vs our NRE result |
-| `p_fil_img.npy` | Raw NRE P(filament) array (required by `crab_comparison.py`) |
+| File | Description |
+|------|-------------|
+| `data/Crab_B_cal.fits` / `Crab_V_cal.fits` / `Crab_R_cal.fits` | Flat-corrected, aligned, APASS-calibrated images |
+| `data/p_fil_img.npy` | Raw NRE P(filament) array |
+| `output/calibration_check.png` | Instrumental vs catalog magnitude scatter plots for all three bands |
+| `output/ratio_maps.png` | log(R/B) and log(V/B) spatial maps of the Crab |
+| `output/color_color.png` | Color-color diagram with density and radial distance panels |
+| `output/spatial_overlay.png` | Side-by-side comparison of the three classification methods |
+| `output/rgb_crab.png` | False-color BVR composite |
+| `output/nre_classification.png` | NRE P(filament) probability map + histogram |
 
 ---
 
@@ -75,16 +79,15 @@ scikit-image
 scipy
 scikit-learn
 matplotlib
-reproject          # for crab_comparison.py only
 ```
 
 ---
 
 ## Data
 
-Observations taken 2026-03-17 at Leuschner Observatory. Three 60-second exposures in B, V, and R. Plate scale ~1.018 arcsec/px (7.52 µm pixels, 2×2 binning, 3047 mm focal length).
+Observations taken 2025-03-17 at Leuschner Observatory. Three 60-second exposures in B, V, and R. Plate scale ~1.018 arcsec/px (7.52 µm pixels, 2×2 binning, 3047 mm focal length).
 
-HST comparison data from proposal 17500 (WFC3/UVIS, 6-tile mosaic). Downloaded via MAST — not included.
+Raw FITS frames are not included in the repo. The calibrated outputs (`data/Crab_*_cal.fits`) are checked in and are sufficient to run `Project_E_NRE.py` and `RGB_Stack.py` directly.
 
 ---
 
