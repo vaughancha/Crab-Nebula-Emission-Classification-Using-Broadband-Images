@@ -85,7 +85,7 @@ matplotlib
 
 ## Data
 
-Observations taken 2025-03-17 at Leuschner Observatory. Three 60-second exposures in B, V, and R. Plate scale ~1.018 arcsec/px (7.52 µm pixels, 2×2 binning, 3047 mm focal length).
+Observations taken 2026-03-17 at Leuschner Observatory. Three 60-second exposures in B, V, and R. Plate scale ~1.018 arcsec/px (7.52 µm pixels, 2×2 binning, 3047 mm focal length).
 
 Raw FITS frames are not included in the repo. The calibrated outputs (`data/Crab_*_cal.fits`) are checked in and are sufficient to run `Project_E_NRE.py` and `RGB_Stack.py` directly.
 
